@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>分账工具</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- 书籍封面风格 --- */
+        :root {
+            --main-blue: #315A8C; /* 从图片中精确提取的蓝色 */
+            --card-white: #FFFFFF;
+            --text-on-blue: #FFFFFF;
+            --text-on-white: #333333;
+            --border-light: #EAEAEA;
+            --bg-page: #F5F7FA;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Noto Serif JP', serif; /* 全局应用优雅的衬线字体 */
+            background-color: var(--bg-page);
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .book-cover-container {
+            width: 100%;
+            max-width: 900px;
+            background-color: var(--main-blue);
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden; /* 确保圆角能裁剪内部元素 */
+        }
+
+        /* 顶部插画区域 */
+        .artwork-header {
+            width: 100%;
+            height: 450px; /* 给插画一个固定的高度 */
+            background-image: url('https://spice.eplus.jp/images/nuYfh8jMxOtJBft6xkqWUEGSeARqBWFulr243YHGxK5P8dCgIavSJGFxoXVJN6tG/');
+            background-size: cover;
+            background-position: center 30%; /* 微调图片垂直位置，突出人物 */
+        }
+
+        .tool-content {
+            padding: 30px;
+        }
+        
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            font-weight: 700;
+            color: var(--text-on-blue);
+            margin: 0;
+            margin-bottom: 30px;
+        }
+
+        /* 输入框样式 */
+        input[type="text"], input[type="number"] {
+            font-family: 'Noto Serif JP', serif;
+            background: var(--card-white);
+            color: var(--text-on-white);
+            padding: 12px 15px;
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            font-size: 1em;
+            width: 100%;
+            box-sizing: border-box;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        input:focus {
+            outline: none;
+            border-color: var(--main-blue);
+            box-shadow: 0 0 0 3px rgba(49, 90, 140, 0.3);
+        }
+
+        /* 总金额区域 */
+        .total-section {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .total-section label {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: var(--text-on-blue);
+            display: block;
+            margin-bottom: 10px;
+        }
+        .total-section input {
+            text-align: center;
+            max-width: 220px;
+            font-size: 1.2em;
+        }
+        
+        /* 成员网格 */
+        .members-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 25px;
+        }
+
+        /* 成员卡片 */
+        .member-card {
+            background: var(--card-white);
+            color: var(--text-on-white);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid var(--border-light);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            position: relative;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .member-card .member-result {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: var(--main-blue);
+            background-color: #F0F5FA;
+            padding: 10px;
+            text-align: center;
+            border-radius: 8px;
+            margin-top: 5px;
+        }
+        
+        /* 按钮样式 */
+        .styled-button {
+            font-family: 'Noto Serif JP', serif;
+            font-weight: 700;
+            background: var(--card-white);
+            color: var(--main-blue);
+            border: 2px solid var(--card-white);
+            border-radius: 8px;
+            cursor: pointer;
+            padding: 10px 20px;
+            font-size: 1.1em;
+            transition: all 0.2s ease-in-out;
+        }
+        .styled-button:hover {
+            background: transparent;
+            color: var(--card-white);
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .remove-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 26px;
+            height: 26px;
+            background-color: #e9ecef;
+            color: #6c757d;
+            border: none;
+            border-radius: 50%;
+            font-size: 16px;
+            line-height: 26px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 400;
+        }
+        .remove-btn:hover {
+            background-color: #d33a2c;
+            color: white;
+            transform: scale(1.1);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="book-cover-container">
+        <div class="artwork-header"></div>
+        <div class="tool-content">
+            <h1>分账工具</h1>
+
+            <div class="total-section">
+                <label for="total-amount">总金额</label>
+                <input type="number" id="total-amount" placeholder="¥" oninput="calculate()">
+            </div>
+    
+            <div class="members-grid" id="members-container">
+                <!-- JavaScript会在这里动态生成成员卡片 -->
+            </div>
+    
+            <div class="controls">
+                <button class="styled-button add-btn" onclick="addMember()">+ 增加成员</button>
+                <button class="styled-button reset-btn" onclick="resetAll()">🔄 重置</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript 部分无需改动，它负责功能逻辑
+        const membersContainer = document.getElementById('members-container');
+        let memberCounter = 0;
+
+        function createMemberCard(isRemovable = false) {
+            memberCounter++;
+            const memberId = memberCounter;
+            
+            const card = document.createElement('div');
+            card.className = 'member-card';
+            card.id = `member-card-${memberId}`;
+            
+            let removeButtonHTML = isRemovable ? `<button class="remove-btn" onclick="removeMember(${memberId})">-</button>` : '';
+
+            card.innerHTML = `
+                ${removeButtonHTML}
+                <input type="text" class="member-name" placeholder="成员 ${memberId} 名称">
+                <input type="number" class="member-time" placeholder="参与小时数" oninput="calculate()">
+                <div class="member-result">¥ 0.00</div>
+            `;
+            
+            membersContainer.appendChild(card);
+        }
+
+        function addMember() { createMemberCard(true); }
+
+        function removeMember(memberId) {
+            const cardToRemove = document.getElementById(`member-card-${memberId}`);
+            if (cardToRemove) {
+                cardToRemove.remove();
+                calculate();
+            }
+        }
+
+        function calculate() {
+            const totalAmount = parseFloat(document.getElementById('total-amount').value) || 0;
+            const memberCards = document.querySelectorAll('.member-card');
+            let totalHours = 0;
+            const hoursPerMember = [];
+
+            memberCards.forEach(card => {
+                const timeInput = card.querySelector('.member-time');
+                const hours = parseFloat(timeInput.value) || 0;
+                hoursPerMember.push(hours);
+                totalHours += hours;
+            });
+
+            const costPerHour = (totalAmount > 0 && totalHours > 0) ? totalAmount / totalHours : 0;
+
+            memberCards.forEach((card, index) => {
+                const memberCost = hoursPerMember[index] * costPerHour;
+                const resultElement = card.querySelector('.member-result');
+                resultElement.textContent = `¥ ${memberCost.toFixed(2)}`;
+            });
+        }
+        
+        function resetAll() {
+            document.getElementById('total-amount').value = '';
+            membersContainer.innerHTML = '';
+            memberCounter = 0;
+            initialize();
+            calculate();
+        }
+
+        function initialize() {
+            for (let i = 0; i < 2; i++) {
+                createMemberCard(false);
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', initialize);
+    </script>
+
+</body>
+</html>
